@@ -2,7 +2,6 @@ import os
 from dataclasses import dataclass, asdict, field
 
 import torch
-from transformers import BitsAndBytesConfig
 
 @dataclass
 class PathConfig:
@@ -17,13 +16,6 @@ class EnvConfig:
     num_workers: int = field(default_factory=lambda: os.cpu_count() // 2)
     use_amp: bool = field(default_factory=lambda: torch.cuda.is_available())  # Automatic Mixed Precision
     mixed_precision: str = "fp16"  # "bf16"도 가능
-
-    bnb_config: BitsAndBytesConfig = field(default_factory=lambda: BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_use_double_quant=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.float16
-    ))
 
     def __post_init__(self):
         print(f"Using device: {self.device}, num_workers: {self.num_workers}, AMP: {self.use_amp}")
@@ -59,3 +51,18 @@ if __name__ == "__main__":
     # 경로 출력
     print(config.path.data_train_raw)  # /raw/train.csv
     print(config.path.dir_guidelines)  # /raw/건설안전지침
+
+
+
+    
+    # configs
+    csv_path = 
+    pdf_files = 
+    chunk_size = 1024
+    encoding = 'utf-8-sig'
+
+    chain_type1 = "stuff"
+    chain_type2 = "stuff"
+    model_name = "NCSOFT/Llama-VARCO-8B-Instruct"
+    id_prompt_template = "exp_0"
+    pipeline = "exp_0"
