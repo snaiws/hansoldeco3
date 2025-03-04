@@ -1,7 +1,7 @@
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 
-from.configs import build_exp
+from.configs.basic import build_exp
 from data_engineering.dataset.precendent import CSVPrecendentDataset
 from data_engineering.prompt_engineering.LLM_template import get_prompt_template
 from data_engineering.dataset.guideline import PDFDataset
