@@ -1,10 +1,5 @@
-from dataclasses import dataclass
 
-
-
-@dataclass
 class Question:
-    @classmethod
     def exp_0(row):
         question = (
             f"공사종류 대분류 '{row['공사종류(대분류)']}', 중분류 '{row['공사종류(중분류)']}' 공사 중 "

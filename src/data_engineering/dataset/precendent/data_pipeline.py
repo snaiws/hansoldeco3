@@ -1,5 +1,3 @@
-from functools import partial
-
 from .preprocess.cleaning import *
 from .preprocess.feature_engineering import *
 
@@ -29,5 +27,5 @@ class Pipelines:
         return df
     
     
-def install(data, pipeline:str = "pipeline_0", kwargs:dict = {}):
-    return getattr(Pipelines, pipeline)(data, **kwargs)
+def install_pipeline(pipeline:str = "pipeline_0"):
+    return getattr(Pipelines, pipeline)

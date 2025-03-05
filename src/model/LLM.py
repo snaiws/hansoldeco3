@@ -41,7 +41,7 @@ def load_llm_model_huggingface(model_name: str = "NCSOFT/Llama-VARCO-8B-Instruct
 
 
 
-def load_llm_model_huggingface(model_name: str = "NCSOFT/Llama-VARCO-8B-Instruct"):
+def load_llm_model_vllm(model_name: str = "NCSOFT/Llama-VARCO-8B-Instruct"):
     # vLLM에서 bitsandbytes 8bit 적용
     llm = LLM(
         model=model_name,

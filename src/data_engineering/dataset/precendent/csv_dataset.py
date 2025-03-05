@@ -1,95 +1,50 @@
+
+from typing import Dict, Any
+
 import pandas as pd
-from typing import Dict
 
 from .base import BasePrecendentDataset
 
-
-
 class CSVPrecendentDataset(BasePrecendentDataset):
     """
-    CSV 파일에서 chunk_size 단위로 데이터를 순차 로드 (IterableDataset).
-    parse_fn, transform_fn을 이용해 후처리를 적용할 수 있다.
+    CSV 파일을 Dataset 형태로 로드하는 클래스
     """
-
-    def __init__(self, 
-                 csv_path: str, 
-                 chunk_size: int = 1024,
-                 encoding: str = 'utf-8-sig', 
-                 parser=None, 
-                 pipeline=None,
-                 **read_csv_kwargs):
-        super().__init__(
-            chunk_size=chunk_size,
-            parser=parser,
-            pipeline=pipeline
-        )
+    def __init__(
+        self, csv_path: str, encoding: str = 'utf-8-sig',
+        parser = None,
+        pipeline = None,
+        **read_csv_kwargs
+    ):
+        """
+        csv_path: 데이터 파일 경로
+        encoding: 파일 인코딩
+        parser: 데이터 전처리 함수 (옵션)
+        pipeline: 추가 변환을 위한 함수 (옵션)
+        read_csv_kwargs: pandas read_csv 옵션들
+        """
         self.csv_path = csv_path
-        self.encoding = encoding
-        self.read_csv_kwargs = read_csv_kwargs
-
-        # (선택) CSV 전체 길이를 미리 구해두고 싶으면 아래처럼
-        # self.total_length = self._get_total_length()
-
-    def fetch_chunk(self, offset: int, chunk_size: int) -> List[Dict[str, Any]]:
-        """
-        offset ~ offset+chunk_size-1 행을 한 번에 로드
-        (pandas의 skiprows, nrows 활용)
-
-        - CSV가 매우 큰 경우에는 이 방식이 비효율적일 수 있음
-          => pyarrow, polars 등을 고려
-        """
-        if offset == 0:
-            # 첫 호출
-            df = pd.read_csv(
-                self.csv_path,
-                encoding=self.encoding,
-                nrows=chunk_size,
-                **self.read_csv_kwargs
-            )
-        else:
-            skiprows = range(1, offset + 1)  # header=0 번째, offset까지 스킵
-            df = pd.read_csv(
-                self.csv_path,
-                encoding=self.encoding,
-                skiprows=skiprows,
-                nrows=chunk_size,
-                header=0,
-                **self.read_csv_kwargs
-            )
-        if df.empty:
-            return []
-        return df.to_dict('records')
-
-    # def _get_total_length(self):
-    #     df = pd.read_csv(self.csv_path, encoding=self.encoding)
-    #     return len(df)
-
-
-if __name__ == "__main__":
-    from torch.utils.data import DataLoader
-
-    csv_path = ""
-
-    # dataset 생성
-    dataset = CSVPrecendentDataset(
-        csv_path=csv_path,
-        chunk_size=2000,
-        parser=None,
-        pipeline=None
-    )
-
-    # DataLoader로 감싸기 (batch_size=32 등)
-    loader = DataLoader(dataset, batch_size=32)
-
-    for batch_idx, batch in enumerate(loader):
-        # batch는 길이가 32인 list of dict (or dict of list) 형태가 될 것
-        # parse_fn + transform_fn이 적용된 question/answer가 들어있음
-        print(f"Batch {batch_idx}: size={len(batch)}")
+        self.parser = parser
+        self.pipeline = pipeline
         
-        # 예시: 첫 레코드
-        if len(batch) > 0:
-            print(batch[0])
+        # CSV 파일을 한 번 로드하여 DataFrame으로 유지
+        self.data = self.get_source(csv_path, encoding, read_csv_kwargs)
         
-        if batch_idx == 2:
-            break
+        # (선택적) 파싱 및 추가 변환 적용
+    def get_source(self, csv_path, encoding, read_csv_kwargs):
+        data = pd.read_csv(csv_path, encoding=encoding, **read_csv_kwargs)
+        if self.parser:
+            data = self.parser(data)
+        if self.pipeline:
+            data = self.pipeline(data)
+        return data
+
+    def __len__(self):
+        return len(self.data)
+    
+    def __getitem__(self, idx: int) -> Dict[str, Any]:
+        """
+        DataLoader에서 개별 row(dict) 반환
+        """
+        row = self.data.iloc[idx].to_dict()
+        return row
 

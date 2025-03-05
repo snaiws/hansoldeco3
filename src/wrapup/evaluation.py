@@ -41,3 +41,18 @@ def scoring(cossims, jaccardsims):
         s += max(cossim,0)*0.7 + max(jaccardsim, 0)*0.3
         l += 1
     return s/l
+
+if __name__ == "__main__":
+    import pandas as pd
+    pred_sample = pd.read_csv("/workspace/Storage/hansoldeco3/Data/sample_result.csv")
+    true_sample = pd.read_csv("/workspace/Storage/hansoldeco3/Data/sample/v1/test.csv")
+    cossims, jaccardsims = calculate_similarities(true_sample['재발방지대책 및 향후조치계획'], pred_sample['answer'])
+    score = scoring(cossims, jaccardsims)
+    print(score)
+
+    
+    pred_sample = pd.read_csv("/workspace/Storage/hansoldeco3/Data/vllm_result.csv")
+    true_sample = pd.read_csv("/workspace/Storage/hansoldeco3/Data/sample/v1/test.csv")
+    cossims, jaccardsims = calculate_similarities(true_sample['재발방지대책 및 향후조치계획'], pred_sample['answer'])
+    score = scoring(cossims, jaccardsims)
+    print(score)

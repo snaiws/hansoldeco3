@@ -1,9 +1,10 @@
+from typing import Any
+
 from langchain_core.runnables import Runnable
 from langchain_core.pydantic_v1 import BaseModel
 from langchain_core.runnables import Runnable, RunnableLambda
-
-
 from vllm import LLM, SamplingParams
+
 
 
 # vLLM을 LangChain 호환 `Runnable`로 감싸는 클래스
@@ -22,8 +23,8 @@ class VLLMRunner(Runnable, BaseModel):
         input_text = str(input_text)  # 문자열로 강제 변환
 
         sampling_params = SamplingParams(
-            temperature=kwargs.get("temperature", 0.7),
-            max_tokens=kwargs.get("max_tokens", 512),
+            temperature=kwargs.get("temperature", 0.1),
+            max_tokens=kwargs.get("max_tokens", 64),
             stop=kwargs.get("stop", None),
         )
         outputs = self.llm.generate([input_text], sampling_params)

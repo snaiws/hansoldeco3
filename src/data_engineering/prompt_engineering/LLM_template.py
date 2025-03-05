@@ -31,4 +31,8 @@ class Template:
 
 
 def get_prompt_template(exp = "exp_0"):
-    return getattr(Template, exp)
+    return getattr(Template, exp)()
+
+if __name__ == "__main__":
+    prompot_template = get_prompt_template(exp = "exp_0")
+    print(prompot_template.template)
