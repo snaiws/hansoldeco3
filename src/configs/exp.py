@@ -16,9 +16,13 @@ class ExpDefineUnit:
     RAG_chain_type1 = "stuff"
     RAG_chain_type2 = "stuff"
     model_name : str = "NCSOFT/Llama-VARCO-8B-Instruct"
+    temperature : float = 0.1
+    top_p : float = 1.0
+    top_k : float = -1
+    max_new_tokens : int = 64
 
     def to_dict(self):
-        asdict(self)
+        return asdict(self)
 
     @classmethod
     def exp_0(cls):
