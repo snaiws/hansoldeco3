@@ -1,6 +1,8 @@
 from torch.utils.data import Dataset
-from langchain.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+
 
 class PDFDataset(Dataset):
     def __init__(self, pdf_paths, chunk_size=1000, chunk_overlap=100):

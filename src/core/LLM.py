@@ -1,13 +1,15 @@
-from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
-from langchain.llms import HuggingFacePipeline
-
 import torch
+from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from langchain_community.llms.vllm import VLLM
+from langchain_community.llms import HuggingFacePipeline
 
 
-class LLM_loading_cases:
+
+class LLMDefineTool:
     '''
-    유인원식 클래스
+    LLM 훈련 안해봤기때문에
+    일단 유인원식 클래스
+    새로운 케이스가 필요한 경우 몽키패치로 메소드 추가
     '''
     def load_base(model_name: str = "NCSOFT/Llama-VARCO-8B-Instruct", max_new_tokens = 64, temperature = 0.1, top_p = 1, top_k = -1):
         """
@@ -73,5 +75,6 @@ def load_LLM(case = "load_vllm", control_params = {""}):
     top_p 
     top_k
     max_new_tokens
+    이렇게만 사용
     '''
-    return getattr(LLM_loading_cases, case)(**control_params)
+    return getattr(LLMDefineTool, case)(**control_params)
