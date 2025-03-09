@@ -162,9 +162,6 @@ def inference_exp():
         # 여기서 참고문서 기록 후 아래에서 결과와 같이 저장할 필요 있음
         final_result = result['result']
         test_results.append(final_result)
-        break
-    print(test_results)
-    quit()
     
     # 저장
     os.makedirs(path_exp, exist_ok=True)
@@ -173,8 +170,6 @@ def inference_exp():
     with open(path_param, 'w') as f:
         json.dump(config_exp.to_dict(), f)
     pd.DataFrame(test_results, columns=['answer']).to_csv(path_result, index=False)
-
-
 
 
 
