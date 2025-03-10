@@ -17,8 +17,8 @@ class DualChainUnit(BaseChainUnit):
         precendent_context = "\n".join([doc.page_content for doc in precendent_docs])
         
         formatted_prompt = self.prompt_template.format(
-            guideline_context=guideline_context,
-            precendent_context=precendent_context,
+            context_guideline=guideline_context,
+            context_precendent=precendent_context,
             question=query
         )
         return self.llm(formatted_prompt)

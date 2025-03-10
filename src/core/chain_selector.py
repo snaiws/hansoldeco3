@@ -9,13 +9,13 @@ class ChainControlTool:
         """
         Parameters:
             llm: LLM 호출 함수 또는 객체 (callable)
-            strategy: "baseline" 또는 "manual" 문자열로 선택
+            strategy: "baseline" 또는 "dual" 문자열로 선택
             retrievers:
                 - baseline: {"precendent": <retriever>}
-                - manual: {"guideline": <retriever>, "precendent": <retriever>}
+                - dual: {"guideline": <retriever>, "precendent": <retriever>}
             prompt_template:
                 - baseline: PromptTemplate 객체 (input_variables=["context", "question"])
-                - manual: PromptTemplate 객체 (input_variables=["guideline_context", "precendent_context", "question"])
+                - dual: PromptTemplate 객체 (input_variables=["guideline_context", "precendent_context", "question"])
             chain_type: RetrievalQA.from_chain_type에 사용할 체인 타입 ("stuff", "map_reduce" 등)
         """
         self.llm = llm
@@ -45,14 +45,14 @@ class ChainControlTool:
                 chain_type=self.chain_type
             )
         
-        elif self.strategy_name == "manual":
-            # manual 모드는 retrievers에 "guideline"과 "precendent"가 모두 있어야 함
+        elif self.strategy_name == "dual":
+            # dual 모드는 retrievers에 "guideline"과 "precendent"가 모두 있어야 함
             if self.retrievers["precendent"] is None or self.retrievers["guideline"] is None:
-                raise ValueError("manual 모드는 'guideline'과 'precendent' retriever 모두 필요합니다.")
+                raise ValueError("dual 모드는 'guideline'과 'precendent' retriever 모두 필요합니다.")
             # 프롬프트 템플릿에 필요한 변수가 존재하는지 
             
             self.prompt_template = PromptTemplate(
-                input_variables = ["context_precedent", "context_guideline", "question"],
+                input_variables = ["context_precendent", "context_guideline", "question"],
                 template = self.prompt_template_format.template
             )
             

@@ -71,21 +71,22 @@ class ExpDefineUnit:
         return cls(
             train = "sample/v1/train.csv", 
             test = "sample/v1/test.csv",
-            chain_strategy = "",
-            prompt_template_format = "",
+            chain_strategy = "dual",
+            version_prompt_precendent = "exp_1",
+            prompt_template_format = "exp_1",
             retriever_guideline_name = "FAISSVSUnit",
             embedding_model_name_guideline = "jhgan/ko-sbert-nli",
-            retriever_guideline_params = field(default_factory=lambda: 
-                (
-                    {
-                        "search_type" : "similarity",
-                        "search_kwargs" : {
-                            "k" : 5
-                        }
+            retriever_guideline_params = (
+                {
+                    "search_type" : "similarity",
+                    "search_kwargs" : {
+                        "k" : 5
                     }
-                )),
+                },
+            ),
             splitter_guideline_name = "RecursiveCharacterTextSplitter",
-            splitter_guideline_kwargs = field(default_factory=lambda: {"chunk_size":100, "chunk_overlap" : 20})
+            splitter_guideline_kwargs = {"chunk_size":100, "chunk_overlap" : 20},
+            max_new_tokens = 200
         )
 
 def build_exp(exp_name = "exp_0"):

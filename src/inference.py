@@ -17,14 +17,14 @@ from utils.now import get_now
 
 
 
-def inference_exp():
+def inference_exp(exp = "exp_1", num_output = -1):
     """
     (1) 선례 데이터 전처리 후 선례 docs 생성, 선례 데이터 
     (2) DF-기반 Retrievr와 PDF-기반 Retriever 중 선택(또는 병합) 가능
     (3) 결과를 CSV로 저장
     """
     env = EnvDefineUnit()
-    config_exp = build_exp('exp_1')
+    config_exp = build_exp(exp)
     now = get_now("Asia/Seoul")
 
 
@@ -64,7 +64,6 @@ def inference_exp():
     chain_strategy = config_exp.chain_strategy
     chain_type = config_exp.chain_type
 
-
     # 테스트 데이터 로드
     pipeline = install_pipeline(pipeline)
     test_data = pd.read_csv(path_test, encoding = encoding)
@@ -85,7 +84,7 @@ def inference_exp():
         if splitter_precendent_name is not None:
             splitter_precendent = get_splitter(
                 splitter_name = splitter_precendent_name, 
-                kwargs = splitter_precendent_kwargs
+                **splitter_precendent_kwargs
                 )
         else:
             splitter_precendent = None
@@ -110,7 +109,7 @@ def inference_exp():
         if splitter_guideline_name is not None:
             splitter_guideline = get_splitter(
                 splitter_name = splitter_guideline_name, 
-                kwargs = splitter_guideline_kwargs
+                **splitter_guideline_kwargs
                 )
         else:
             splitter_guideline = None
@@ -157,10 +156,14 @@ def inference_exp():
     # 추론
     test_results = []
     for idx, row in tqdm(test_data.iterrows()):
+        if idx == num_output:
+            break
         question = get_prompt_question(row, exp = version_prompt_question)
         result = chain.invoke(question)
         # 여기서 참고문서 기록 후 아래에서 결과와 같이 저장할 필요 있음
-        final_result = result['result']
+        print(result)
+        # final_result = result['result'] # 결과에 참조문서 출력해야 함함
+        final_result = result
         test_results.append(final_result)
     
     # 저장
@@ -175,6 +178,8 @@ def inference_exp():
 
 if __name__ == "__main__":
     import torch
+    exp = input("실험 케이스:\n")
+    num_output = int(input("추론 갯수\n"))
 
     print("CUDA 사용 가능:", torch.cuda.is_available())
     if torch.cuda.is_available():
@@ -182,5 +187,5 @@ if __name__ == "__main__":
         print("사용 중인 GPU:", torch.cuda.get_device_name(0))
 
 
-    inference_exp()
+    inference_exp(exp, num_output)
     

@@ -1,2 +1,2 @@
 from .baseline import BaselineChainUnit
-from .manual import DualChainUnit
+from .dual import DualChainUnit
