@@ -22,7 +22,13 @@ class Pipelines:
         df = preprocess_hierarchy(df, "공종", ["공종_대분류", "공종_소분류"], ">")
         df = preprocess_hierarchy(df, "사고객체", ["사고객체_대분류", "사고객체_소분류"], ">")
         df = preprocess_hierarchy(df, "부위", ["부위1", "부위2"], "/")
-
+        df = preprocess_part_1(df)
+        df = preprocess_season(df)
+        df = preprocess_daytime(df)
+        df = preprocess_recogdelay(df)
+        df = preprocess_temp_2(df)
+        df = preprocess_humid_2(df)
+        
         df = preprocess_id(df)
         return df
     

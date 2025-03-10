@@ -106,3 +106,72 @@ def preprocess_hierarchy(df, col:str, levels:list, sep:str):
     df_.drop(col, axis=1, inplace = True)
     return df_
 
+
+def preprocess_season(df):
+    col1 = "발생일시"
+    col2 = "계절"
+    df_ = df.copy()
+    df_[col2] = np.nan
+    winter = df_[col1].dt.month.isin([1,2,11,12])
+    summer = df_[col1].dt.month.isin([5,6,7,8])
+    spring = df_[col1].dt.month.isin([3,4])
+    fall = df_[col1].dt.month.isin([9,10])
+    df_.loc[winter,col2] = '겨울'
+    df_.loc[summer,col2] = '여름'
+    df_.loc[spring,col2] = '봄'
+    df_.loc[fall,col2] = '가을'
+    df_.insert(df_.columns.get_loc(col1)+1, col2, df_.pop(col2))
+    return df_
+    
+def preprocess_daytime(df):
+    col1 = "발생일시"
+    col2 = "시간대"
+    df_ = df.copy()
+    df_[col2] = np.nan
+    morning = (df_[col1].dt.hour>=6) & (df_[col1].dt.hour<13)
+    afternoon = (df_[col1].dt.hour>=13) & (df_[col1].dt.hour<19)
+    evening = (df_[col1].dt.hour>=19) & (df_[col1].dt.hour<23)
+    night = (df_[col1].dt.hour==23) & (df_[col1].dt.hour<6)
+    df_.loc[morning,col2] = '아침'
+    df_.loc[afternoon,col2] = '낮'
+    df_.loc[evening,col2] = '저녘'
+    df_.loc[night,col2] = '새벽'
+    df_.insert(df_.columns.get_loc(col1)+1, col2, df_.pop(col2))
+    return df_
+
+
+def preprocess_recogdelay(df):
+    col1 = "발생일시"
+    col2 = "사고인지 시간"
+    col3 = "사고인지시차"
+    df_ = df.copy()
+    df_[col3] = (df_[col2]-df_[col1]).dt.seconds/3600
+    df_.insert(df_.columns.get_loc(col2)+1, col3, df_.pop(col3))
+    return df_
+    
+
+def preprocess_temp_2(df):
+    col1 = "기온"
+    col2 = "발생일시"
+    df_ = df.copy()
+    
+    mask = (~df_[col2].dt.month.isin([5,6,7,8]) & (df_[col1] > 30)) | (df_[col1] > 40) | (df_[col1]<-33)
+    
+    df_.loc[mask, col1] = np.nan
+    return df_
+
+def preprocess_humid_2(df):
+    col = "습도"
+    df_ = df.copy()
+    mask = df_[col] > 100
+    
+    df_.loc[mask, col] = np.nan
+    return df_
+
+def preprocess_part_1(df):
+    col1 = "부위1"
+    col2 = "부위2"
+    df_ = df.copy()
+    df_[col1] = df_[col1].replace('', np.nan)
+    df_[col2] = df_[col2].replace('', np.nan)
+    return df_
