@@ -64,7 +64,6 @@ class Pipelines:
         df = preprocess_ao1_1(df)
         df = preprocess_ao2_1(df)
         df = preprocess_wp_1(df)
-        df = preprocess_part_1(df)
         df = preprocess_place_1(df)
 
         df = preprocess_id(df)
