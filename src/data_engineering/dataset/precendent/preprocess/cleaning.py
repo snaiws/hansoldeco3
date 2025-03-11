@@ -50,7 +50,7 @@ def preprocess_temp_1(df):
     col = "기온"
     df_ = df.copy()
     df_[col] = df_[col].str.replace("℃","")
-    df_[col].replace("", np.nan, inplace = True)
+    df_.replace({col:{"":np.nan}}, inplace = True)
     df_[col] = df_[col].astype(float)
     return df_
 
@@ -58,7 +58,7 @@ def preprocess_humid_1(df):
     col = "습도"
     df_ = df.copy()
     df_[col] = df_[col].str.replace("%","")
-    df_[col].replace("", np.nan, inplace = True)
+    df_.replace({col:{"":np.nan}}, inplace = True)
     df_[col] = df_[col].astype(float)
     return df_
 
@@ -67,8 +67,8 @@ def preprocess_area_1(df):
     df_ = df.copy()
     df_[col] = df_[col].str.replace(",","")
     df_[col] = df_[col].str.replace("㎡","")
-    df_[col].replace("", np.nan, inplace = True)
-    df_[col].replace("-", np.nan, inplace = True)
+    df_.replace({col:{"":np.nan}}, inplace = True)
+    df_.replace({col:{"-":np.nan}}, inplace = True)
     df_[col] = df_[col].astype(float)
     return df_
 
@@ -77,7 +77,7 @@ def preprocess_floor_1(df):
     col1 = "지상"
     col2 = "지하"
     df_ = df.copy()
-    df_[col].replace("-", np.nan, inplace = True)
+    df_.replace({col:{"-":np.nan}}, inplace = True)
     df_ = preprocess_hierarchy(df_, col, [col1, col2], sep = ",")
     
     df_[col1] = df_[col1].str.replace(r'\D', '', regex = True)
@@ -172,26 +172,26 @@ def preprocess_part_1(df):
     col1 = "부위1"
     col2 = "부위2"
     df_ = df.copy()
-    df_[col1] = df_[col1].replace('', np.nan)
-    df_[col2] = df_[col2].replace('', np.nan)
+    df_.replace({col1:{"":np.nan}}, inplace = True)
+    df_.replace({col2:{"":np.nan}}, inplace = True)
     return df_
 
 def preprocess_wt_1(df):
     col = '근무종류'
     df_ = df.copy()
-    df_[col] = df_[col].replace("기타", np.nan)
+    df_.replace({col:{"기타":np.nan}}, inplace = True)
     return df_
 
 def preprocess_ct2_1(df):
     col = '공사종류_중분류'
     df_ = df.copy()
-    df_[col] = df_[col].replace("기타", np.nan)
+    df_.replace({col:{"기타":np.nan}}, inplace = True)
     return df_
 
 def preprocess_ct3_1(df):
     col = '공사종류_중분류'
     df_ = df.copy()
-    df_[col] = df_[col].replace("기타", np.nan)
+    df_.replace({col:{"기타":np.nan}}, inplace = True)
     return df_
 
 def preprocess_areafloor(df):
@@ -206,51 +206,51 @@ def preprocess_areafloor(df):
 def preprocess_hd_1(df):
     col = '인적사고'
     df_ = df.copy()
-    df_[col] = df_[col].replace("기타", np.nan)
-    df_[col] = df_[col].replace("분류불능", np.nan)
+    df_.replace({col:{"기타":np.nan}}, inplace = True)
+    df_.replace({col:{"분류불능":np.nan}}, inplace = True)
     return df_
 
 def preprocess_md_1(df):
     col = '물적사고'
     df_ = df.copy()
-    df_[col] = df_[col].replace("기타", np.nan)
+    df_.replace({col:{"기타":np.nan}}, inplace = True)
     return df_
 
 def preprocess_mt1_1(df):
     col = '공종_대분류'
     df_ = df.copy()
-    df_[col] = df_[col].replace("기타", np.nan)
+    df_.replace({col:{"기타":np.nan}}, inplace = True)
     return df_
 
 def preprocess_mt2_1(df):
     col = '공종_소분류'
     df_ = df.copy()
-    df_[col] = df_[col].replace("기타", np.nan)
+    df_.replace({col:{"기타":np.nan}}, inplace = True)
     return df_
 
 def preprocess_ao1_1(df):
     col = '사고객체_대분류'
     df_ = df.copy()
-    df_[col] = df_[col].replace("기타", np.nan)
+    df_.replace({col:{"기타":np.nan}}, inplace = True)
     return df_
 
 def preprocess_ao2_1(df):
     col = '사고객체_소분류'
     df_ = df.copy()
-    df_[col] = df_[col].replace("기타", np.nan)
+    df_.replace({col:{"기타":np.nan}}, inplace = True)
     return df_
 
 def preprocess_wp_1(df):
     col = '작업프로세스'
     df_ = df.copy()
-    df_[col] = df_[col].replace("기타", np.nan)
+    df_.replace({col:{"기타":np.nan}}, inplace = True)
     return df_
 
 def preprocess_place_1(df):
     col = '장소'
     df_ = df.copy()
     df_[col] = df_[col].map(lambda x: x.replace('/','').replace('/','기타').strip())
-    df_[col] = df_[col].replace('',np.nan)
+    df_.replace({col:{"":np.nan}}, inplace = True)
     return df_
 
 def preprocess_part_1(df):
