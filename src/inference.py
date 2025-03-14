@@ -60,6 +60,9 @@ def inference_exp(exp = "exp_1", num_output = -1):
     top_p = config_exp.top_p
     top_k = config_exp.top_k
     max_new_tokens = config_exp.max_new_tokens
+    repetition_penalty = config_exp.repetition_penalty
+    frequency_penalty = config_exp.frequency_penalty
+    presence_penalty = config_exp.presence_penalty
 
     chain_strategy = config_exp.chain_strategy
     chain_type = config_exp.chain_type
@@ -138,7 +141,10 @@ def inference_exp(exp = "exp_1", num_output = -1):
         "temperature":temperature,
         "top_p" :top_p,
         "top_k":top_k,
-        "max_new_tokens":max_new_tokens
+        "max_new_tokens":max_new_tokens,
+        "repetition_penalty":repetition_penalty,
+        "frequency_penalty":frequency_penalty,
+        "presence_penalty":presence_penalty
     }
     llm = load_LLM(model_strategy, model_params)
 
@@ -155,9 +161,11 @@ def inference_exp(exp = "exp_1", num_output = -1):
 
     # 추론
     test_results = []
+    i=0
     for idx, row in tqdm(test_data.iterrows()):
-        if idx == num_output:
+        if i == int(num_output):
             break
+        print(i)
         question = get_prompt_question(row, exp = version_prompt_question)
         result = chain.invoke(question)
         # 여기서 참고문서 기록 후 아래에서 결과와 같이 저장할 필요 있음
@@ -165,6 +173,7 @@ def inference_exp(exp = "exp_1", num_output = -1):
         # final_result = result['result'] # 결과에 참조문서 출력해야 함함
         final_result = result
         test_results.append(final_result)
+        i+=1
     
     # 저장
     os.makedirs(path_exp, exist_ok=True)
