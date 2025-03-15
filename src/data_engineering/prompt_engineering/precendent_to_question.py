@@ -14,33 +14,94 @@ class Question:
         return question
     
     def exp_1(row):
-        question = (
-            # 시간
-            f"다음과 같은 상황에서 공사 중 사고가 발생했습니다."
-            f"계절: '{'모름' if pd.isna(row['계절']) else row['계절']}',"
-            f"시간대: '{'모름' if pd.isna(row['시간대']) else row['시간대']}',"
-            f"날씨: '{'모름' if pd.isna(row['날씨']) else row['날씨']}',"
-            f"기온: '{'모름' if pd.isna(row['기온']) else row['기온']}',"
-            f"습도: '{'모름' if pd.isna(row['습도']) else row['습도']}',"
-            f"장소: '{'모름' if pd.isna(row['장소']) else row['장소']}'"
-            f"지상 '{'모름' if pd.isna(row['지상']) else str(row['지상'])+'층'}', 지하 '{'모름' if pd.isna(row['지하']) else str(row['지하'])+'층'}'인 구조물 공사에서 사고 발생."
-
-            f"공사종류: 대분류 '{'모름' if pd.isna(row['공사종류_대분류']) else row['공사종류_대분류']}', 중분류 '{'모름' if pd.isna(row['공사종류_중분류']) else row['공사종류_중분류']}', 소분류 '{'모름' if pd.isna(row['공사종류_소분류']) else row['공사종류_소분류']}' 공사 중 "
-            f"공종 대분류: '{row['공종_대분류']}', 중분류 '{row['공종_소분류']}' 작업에서 "
-            f"작업 프로세스느 '{row['작업프로세스']}'이며, 사고 원인은 '{row['사고원인']}'입니다. "
-            f"사고가 발견되기까지 걸린 시간은 '{'모름' if pd.isna(row['사고인지시차']) else row['사고인지시차']}',"
-            
-            f"인적피해는 '{'모름' if pd.isna(row['인적사고']) else row['인적사고']}',"
-            f"피해 당시 근무종류: '{'모름' if pd.isna(row['근무종류']) else row['근무종류']}',"
-            f"물적피해는 '{'' if pd.isna(row['사고객체_대분류']) else row['사고객체_대분류']+'인 '}{'' if pd.isna(row['사고객체_소분류']) else row['사고객체_소분류']+'가 '}{'' if pd.isna(row['물적사고']) else row['물적사고']}',"
-            f"사고부위: '{'' if pd.isna(row['부위2']) else pd.isna(row['부위2'])}'"
-            
-            f"사고객체 '{row['사고객체_대분류']}'(소분류: '{row['사고객체_소분류']}')와 관련된 사고가 발생했습니다. "
-            
-            f"이에 대한 '대책'은 무엇인가요?"
-            )
-        return question
-
+        components = []
+        components.append("다음과 같은 상황에서 공사 중 사고가 발생했습니다.")
+        
+        # 시간 관련 항목
+        if not pd.isna(row.get('계절')):
+            components.append(f"계절: {row['계절']}")
+        if not pd.isna(row.get('시간대')):
+            components.append(f"시간대: {row['시간대']}")
+        if not pd.isna(row.get('날씨')):
+            components.append(f"날씨: {row['날씨']}")
+        if not pd.isna(row.get('기온')):
+            components.append(f"기온: {row['기온']}도")
+        if not pd.isna(row.get('습도')):
+            components.append(f"습도: {row['습도']}%")
+        if not pd.isna(row.get('장소')):
+            components.append(f"장소: {row['장소']}")
+        
+        # 구조물 층수: 지상, 지하
+        level_parts = []
+        if not pd.isna(row.get('지상')):
+            level_parts.append(f"지상 {row['지상']}층")
+        if not pd.isna(row.get('지하')):
+            level_parts.append(f"지하 {row['지하']}층")
+        if level_parts:
+            components.append("구조물: " + ", ".join(level_parts) + "에서 사고 발생")
+        
+        # 공사종류 관련 (대분류, 중분류, 소분류)
+        cons_parts = []
+        if not pd.isna(row.get('공사종류_대분류')):
+            cons_parts.append(f"대분류: {row['공사종류_대분류']}")
+        if not pd.isna(row.get('공사종류_중분류')):
+            cons_parts.append(f"중분류: {row['공사종류_중분류']}")
+        if not pd.isna(row.get('공사종류_소분류')):
+            cons_parts.append(f"소분류: {row['공사종류_소분류']}")
+        if cons_parts:
+            components.append("공사종류: " + ", ".join(cons_parts))
+        
+        # 공종 관련 (대분류, 소분류)
+        work_parts = []
+        if not pd.isna(row.get('공종_대분류')):
+            work_parts.append(f"대분류: {row['공종_대분류']}")
+        if not pd.isna(row.get('공종_소분류')):
+            work_parts.append(f"중분류: {row['공종_소분류']}")
+        if work_parts:
+            components.append("공종: " + ", ".join(work_parts))
+        
+        # 작업 프로세스 및 사고 원인
+        if not pd.isna(row.get('작업프로세스')):
+            components.append(f"작업 프로세스: {row['작업프로세스']}")
+        if not pd.isna(row.get('사고원인')):
+            components.append(f"사고 원인: {row['사고원인']}")
+        
+        # 사고 인지 시차
+        if not pd.isna(row.get('사고인지시차')):
+            components.append(f"사고 인지 시차: {row['사고인지시차']}")
+        
+        # 인적 피해 및 근무 종류
+        if not pd.isna(row.get('인적사고')):
+            components.append(f"인적 피해: {row['인적사고']}")
+        if not pd.isna(row.get('근무종류')):
+            components.append(f"근무 종류: {row['근무종류']}")
+        
+        # 물적 피해: 사고객체 대분류, 소분류, 피해 내용
+        material_parts = []
+        if not pd.isna(row.get('사고객체_대분류')):
+            material_parts.append(f"{row['사고객체_대분류']}인")
+        if not pd.isna(row.get('사고객체_소분류')):
+            material_parts.append(f"{row['사고객체_소분류']}가")
+        if not pd.isna(row.get('물적사고')):
+            material_parts.append(f"{row['물적사고']}")
+        if material_parts:
+            components.append("물적 피해: " + " ".join(material_parts))
+        
+        # 사고 부위
+        if not pd.isna(row.get('부위2')):
+            components.append(f"사고 부위: {row['부위2']}")
+        
+        # 사고객체 (대분류와 소분류)
+        if not pd.isna(row.get('사고객체_대분류')):
+            obj_str = f"사고객체: {row['사고객체_대분류']}"
+            if not pd.isna(row.get('사고객체_소분류')):
+                obj_str += f" (소분류: {row['사고객체_소분류']})"
+            components.append(obj_str)
+        
+        
+        components.append("이에 대한 '대책'은 무엇인가요?")
+        # 모든 항목을 쉼표로 구분하여 결합
+        return ", ".join(components)
 
 
 
