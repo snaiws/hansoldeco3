@@ -7,9 +7,6 @@ from .exp_3 import Experiment_3  # 별도 파일에 선언된 dataclass
 @dataclass    
 class Experiment_4(Experiment_3):
     exp_name : str = "exp_4"
-    data_pipeline : str = "pipeline_2" # 주요변경
-    version_prompt_precendent : str = "exp_2" # 주요변경
-    version_prompt_question : str = "exp_1" # 주요변경
     model_kwargs : dict = field(default_factory=lambda: 
         {
             "temperature" : 0.1,
