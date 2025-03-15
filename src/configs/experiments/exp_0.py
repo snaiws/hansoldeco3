@@ -30,16 +30,18 @@ class Experiment_0(Experiment):
     embedding_model_name_precendent :str = "jhgan/ko-sbert-nli"
 
     retriever_precendent_name : str = "FAISSVSUnit"
-    retriever_precendent_params : tuple = field(default_factory=lambda: (
+    retriever_precendent_params : tuple = field(default_factory=lambda: 
         (
-            {
-                "search_type" : "similarity",
-                "search_kwargs" : {
-                    "k" : 5
-                }
-            },
+            (
+                {
+                    "search_type" : "similarity",
+                    "search_kwargs" : {
+                        "k" : 5
+                    }
+                },
+            )
         )
-        ))
+    )
     splitter_precendent_name : str = None
     splitter_precendent_kwargs : dict = None
 
@@ -50,12 +52,10 @@ class Experiment_0(Experiment):
     splitter_guideline_kwargs : dict = None
 
     # model 파라미터
-    model_strategy : str = 'load_vllm'
+    model_strategy : str = 'load_base'
     model_name : str = "NCSOFT/Llama-VARCO-8B-Instruct"
-    temperature : float = 0.1
-    top_p : float = 1.0
-    top_k : float = -1
-    repetition_penalty : float = 1
-    frequency_penalty : float = 0
-    presence_penalty : float = 0
-    max_new_tokens : int = 64
+    model_kwargs : dict = field(default_factory=lambda: 
+        {
+            "temperature" : 0.1
+        }
+    )

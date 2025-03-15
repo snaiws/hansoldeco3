@@ -57,13 +57,7 @@ def inference_exp(exp_name = "exp_1", num_output = -1):
     
     model_strategy = exp.model_strategy
     model_name = exp.model_name
-    temperature = exp.temperature
-    top_p = exp.top_p
-    top_k = exp.top_k
-    max_new_tokens = exp.max_new_tokens
-    repetition_penalty = exp.repetition_penalty
-    frequency_penalty = exp.frequency_penalty
-    presence_penalty = exp.presence_penalty
+    model_kwargs = exp.model_kwargs
 
     chain_strategy = exp.chain_strategy
     chain_type = exp.chain_type
@@ -138,18 +132,7 @@ def inference_exp(exp_name = "exp_1", num_output = -1):
 
     # LLM 모델 로드
     os.makedirs(path_model, exist_ok=True)
-    model_params = {
-        "model_name":model_name,
-        "cache_dir":path_model,
-        "temperature":temperature,
-        "top_p" :top_p,
-        "top_k":top_k,
-        "max_new_tokens":max_new_tokens,
-        "repetition_penalty":repetition_penalty,
-        "frequency_penalty":frequency_penalty,
-        "presence_penalty":presence_penalty
-    }
-    llm = load_LLM(model_strategy, model_params)
+    llm = load_LLM(model_strategy, model_name, path_model, model_kwargs)
 
 
     print("모델로드완료")

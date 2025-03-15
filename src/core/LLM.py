@@ -13,14 +13,8 @@ class LLMDefineTool:
     '''
     def load_base(
             model_name: str = "NCSOFT/Llama-VARCO-8B-Instruct", 
-            max_new_tokens = 64, 
-            temperature = 0.1, 
-            top_p = 1, 
-            top_k = 5, 
-            no_repeat_ngram_size =2, 
-            repetition_penalty=1,
-            frequency_penalty=2,
-            presence_penalt=0.1
+            cache_dir: str = None,
+            model_kwargs: dict = {}
             ):
         """
         허깅페이스 모델 그대로 쓰는 함수
@@ -37,6 +31,7 @@ class LLMDefineTool:
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
+            cache_dir = cache_dir,
             quantization_config=bnb_config,
             device_map="auto"
         )
@@ -45,16 +40,7 @@ class LLMDefineTool:
             model=model,
             tokenizer=tokenizer,
             task="text-generation",
-            do_sample=True,
-            temperature=temperature,
-            top_p = top_p,
-            top_k = top_k,
-            return_full_text=False,
-            max_new_tokens=max_new_tokens,
-            no_repeat_ngram_size  = no_repeat_ngram_size,
-            repetition_penalty = repetition_penalty,
-            frequency_penalty = frequency_penalty,
-            presence_penalt = presence_penalt,
+            **model_kwargs
         )
 
         llm = HuggingFacePipeline(pipeline=text_generation_pipeline)
@@ -64,35 +50,26 @@ class LLMDefineTool:
 
     def load_vllm(
             model_name: str = "NCSOFT/Llama-VARCO-8B-Instruct", 
-            max_new_tokens = 64, 
-            temperature = 0.1, 
-            top_p = 1, 
-            top_k = -1,
-            repetition_penalty=1,
-            frequency_penalty=2,
-            presence_penalty=0.1
+            cache_dir: str = None,
+            model_kwargs: dict = {}
             ):
         llm = VLLM(
             model=model_name,
-            temperature=temperature,
-            top_p = top_p,
-            top_k = top_k,
-            max_new_tokens=max_new_tokens,
-            frequency_penalty = frequency_penalty,
-            presence_penalt = presence_penalty,
+            download_dir = cache_dir,
             dtype="float16",  # or torch.float16, for FP16 precision&#8203;:contentReference[oaicite:2]{index=2}
             vllm_kwargs={     # extra vLLM.LLM options passed through to the vLLM engine
                 "quantization": "bitsandbytes",      # use 4-bit bitsandbytes quantization&#8203;:contentReference[oaicite:3]{index=3}
                 "load_format": "bitsandbytes",       # load weights in BitsAndBytes 4-bit format&#8203;:contentReference[oaicite:4]{index=4}
                 "gpu_memory_utilization": 0.9,
                 # "trust_remote_code": True  # enable if the model requires remote code execution
-            }
+            },
+            **model_kwargs,
         )
 
         return llm
     
 
-def load_LLM(case = "load_vllm", control_params = {}):
+def load_LLM(case = "load_vllm", model_name = "NCSOFT/Llama-VARCO-8B-Instruct", cache_dir = None, model_kwargs = {}):
     '''
     control_params는 일단 llm 출력에 영향주는
     model_name
@@ -102,4 +79,4 @@ def load_LLM(case = "load_vllm", control_params = {}):
     max_new_tokens
     이렇게만 사용
     '''
-    return getattr(LLMDefineTool, case)(**control_params)
+    return getattr(LLMDefineTool, case)(model_name, cache_dir, model_kwargs)
