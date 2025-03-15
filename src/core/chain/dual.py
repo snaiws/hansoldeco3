@@ -10,8 +10,8 @@ class DualChainUnit(BaseChainUnit):
         self.prompt_template = prompt_template
         
     def invoke(self, query: str):
-        guideline_docs = self.retrievers["guideline"].get_relevant_documents(query)
-        precendent_docs = self.retrievers["precendent"].get_relevant_documents(query)
+        guideline_docs = self.retrievers["guideline"].invoke(query)
+        precendent_docs = self.retrievers["precendent"].invoke(query)
         
         guideline_context = "\n".join([doc.page_content for doc in guideline_docs])
         precendent_context = "\n".join([doc.page_content for doc in precendent_docs])
@@ -21,4 +21,4 @@ class DualChainUnit(BaseChainUnit):
             context_precendent=precendent_context,
             question=query
         )
-        return self.llm(formatted_prompt)
+        return self.llm.invoke(formatted_prompt)
