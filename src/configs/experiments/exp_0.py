@@ -1,9 +1,11 @@
-from dataclasses import dataclass, asdict, field
+from dataclasses import dataclass, field
+
+from .base import Experiment  # 별도 파일에 선언된 dataclass
 
 
 
-@dataclass
-class ExpDefineUnit:
+@dataclass    
+class Experiment_0(Experiment):
     '''
     실험 파라미터
     chain / data / prompt / RAG / model로 나누어 관리
@@ -57,7 +59,3 @@ class ExpDefineUnit:
     frequency_penalty : float = 0
     presence_penalty : float = 0
     max_new_tokens : int = 64
-
-
-    def to_dict(self):
-        return asdict(self)
