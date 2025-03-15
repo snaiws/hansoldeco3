@@ -112,6 +112,7 @@ def preprocess_season(df):
     col2 = "계절"
     df_ = df.copy()
     df_[col2] = np.nan
+    df_[col2] = df_[col2].astype("string[pyarrow]")
     winter = df_[col1].dt.month.isin([1,2,11,12])
     summer = df_[col1].dt.month.isin([5,6,7,8])
     spring = df_[col1].dt.month.isin([3,4])
@@ -128,6 +129,7 @@ def preprocess_daytime(df):
     col2 = "시간대"
     df_ = df.copy()
     df_[col2] = np.nan
+    df_[col2] = df_[col2].astype("string[pyarrow]")
     morning = (df_[col1].dt.hour>=6) & (df_[col1].dt.hour<13)
     afternoon = (df_[col1].dt.hour>=13) & (df_[col1].dt.hour<19)
     evening = (df_[col1].dt.hour>=19) & (df_[col1].dt.hour<23)

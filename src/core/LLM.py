@@ -13,6 +13,7 @@ class LLMDefineTool:
     '''
     def load_base(
             model_name: str = "NCSOFT/Llama-VARCO-8B-Instruct", 
+            cache_dir: str = None,
             max_new_tokens = 64, 
             temperature = 0.1, 
             top_p = 1, 
@@ -37,6 +38,7 @@ class LLMDefineTool:
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
+            cache_dir = cache_dir,
             quantization_config=bnb_config,
             device_map="auto"
         )
@@ -64,6 +66,7 @@ class LLMDefineTool:
 
     def load_vllm(
             model_name: str = "NCSOFT/Llama-VARCO-8B-Instruct", 
+            cache_dir: str = None,
             max_new_tokens = 64, 
             temperature = 0.1, 
             top_p = 1, 
@@ -74,6 +77,7 @@ class LLMDefineTool:
             ):
         llm = VLLM(
             model=model_name,
+            cache_dir = cache_dir,
             temperature=temperature,
             top_p = top_p,
             top_k = top_k,

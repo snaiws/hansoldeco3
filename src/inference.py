@@ -5,7 +5,7 @@ import json
 from tqdm import tqdm
 import pandas as pd # 여기에 있으면 안됨. 함수화 필요
 
-from configs import build_exp, EnvDefineUnit
+from configs import ConfigDefineTool
 from data_engineering.dataset.precendent import CSVPrecendentDataset, install_pipeline # 이전사례 데이터 추상화 실패
 from data_engineering.prompt_engineering.LLM_template import get_prompt_template
 from data_engineering.prompt_engineering.precendent_to_docs import get_prompt_precendent
@@ -17,55 +17,56 @@ from utils.now import get_now
 
 
 
-def inference_exp(exp = "exp_1", num_output = -1):
+def inference_exp(exp_name = "exp_1", num_output = -1):
     """
     (1) 선례 데이터 전처리 후 선례 docs 생성, 선례 데이터 
     (2) DF-기반 Retrievr와 PDF-기반 Retriever 중 선택(또는 병합) 가능
     (3) 결과를 CSV로 저장
     """
-    env = EnvDefineUnit()
-    config_exp = build_exp(exp)
+    config = ConfigDefineTool(exp_name)
+    env = config.get_env()  # 한번만 호출하고 반환값 사용
+    exp = config.get_exp()  # 한번만 호출하고 반환값 사용
     now = get_now("Asia/Seoul")
 
-
     # 경로 - path manager 추상화 실패
-    path_train = os.path.join(env.PATH_DATA_DIR, config_exp.train)
-    path_test = os.path.join(env.PATH_DATA_DIR, config_exp.test)
+    path_train = os.path.join(env.PATH_DATA_DIR, exp.train)
+    path_test = os.path.join(env.PATH_DATA_DIR, exp.test)
     paths_pdf = os.path.join(env.PATH_DATA_DIR, 'raw', '건설안전지침')
     paths_pdf = [os.path.join(paths_pdf, x) for x in os.listdir(paths_pdf)]
     path_exp = os.path.join(env.PATH_LOG_DIR, "exp", now)
+    path_model = os.path.join(env.PATH_MODEL_DIR, exp.model_name)
 
 
-    # 실험 파라미터, 현재 함수는 추후 쪼개질 수 있으므로 변수 하나하나 따로 선언
-    encoding = config_exp.data_encoding
-    pipeline = config_exp.data_pipeline
-    version_prompt_precendent = config_exp.version_prompt_precendent
-    version_prompt_question = config_exp.version_prompt_question
+    # 변수 선언
+    encoding = exp.data_encoding
+    pipeline = exp.data_pipeline
+    version_prompt_precendent = exp.version_prompt_precendent
+    version_prompt_question = exp.version_prompt_question
 
-    retriever_precendent_name = config_exp.retriever_precendent_name
-    retriever_guideline_name = config_exp.retriever_guideline_name
-    embedding_model_name_precendent = config_exp.embedding_model_name_precendent
-    embedding_model_name_guideline = config_exp.embedding_model_name_guideline
-    prompt_template_format = config_exp.prompt_template_format
-    retriever_precendent_params = config_exp.retriever_precendent_params
-    retriever_guideline_params = config_exp.retriever_guideline_params
-    splitter_precendent_name = config_exp.splitter_precendent_name
-    splitter_precendent_kwargs = config_exp.splitter_precendent_kwargs
-    splitter_guideline_name = config_exp.splitter_guideline_name
-    splitter_guideline_kwargs = config_exp.splitter_guideline_kwargs
+    retriever_precendent_name = exp.retriever_precendent_name
+    retriever_guideline_name = exp.retriever_guideline_name
+    embedding_model_name_precendent = exp.embedding_model_name_precendent
+    embedding_model_name_guideline = exp.embedding_model_name_guideline
+    prompt_template_format = exp.prompt_template_format
+    retriever_precendent_params = exp.retriever_precendent_params
+    retriever_guideline_params = exp.retriever_guideline_params
+    splitter_precendent_name = exp.splitter_precendent_name
+    splitter_precendent_kwargs = exp.splitter_precendent_kwargs
+    splitter_guideline_name = exp.splitter_guideline_name
+    splitter_guideline_kwargs = exp.splitter_guideline_kwargs
     
-    model_strategy = config_exp.model_strategy
-    model_name = config_exp.model_name
-    temperature = config_exp.temperature
-    top_p = config_exp.top_p
-    top_k = config_exp.top_k
-    max_new_tokens = config_exp.max_new_tokens
-    repetition_penalty = config_exp.repetition_penalty
-    frequency_penalty = config_exp.frequency_penalty
-    presence_penalty = config_exp.presence_penalty
+    model_strategy = exp.model_strategy
+    model_name = exp.model_name
+    temperature = exp.temperature
+    top_p = exp.top_p
+    top_k = exp.top_k
+    max_new_tokens = exp.max_new_tokens
+    repetition_penalty = exp.repetition_penalty
+    frequency_penalty = exp.frequency_penalty
+    presence_penalty = exp.presence_penalty
 
-    chain_strategy = config_exp.chain_strategy
-    chain_type = config_exp.chain_type
+    chain_strategy = exp.chain_strategy
+    chain_type = exp.chain_type
 
     # 테스트 데이터 로드
     pipeline = install_pipeline(pipeline)
@@ -133,11 +134,13 @@ def inference_exp(exp = "exp_1", num_output = -1):
         "precendent" : retriever_precendent,
         "guideline" : retriever_guideline
     }
-
+    print("벡터스토어 완료")
 
     # LLM 모델 로드
+    os.makedirs(path_model, exist_ok=True)
     model_params = {
         "model_name":model_name,
+        "cache_dir":path_model,
         "temperature":temperature,
         "top_p" :top_p,
         "top_k":top_k,
@@ -149,6 +152,7 @@ def inference_exp(exp = "exp_1", num_output = -1):
     llm = load_LLM(model_strategy, model_params)
 
 
+    print("모델로드완료")
     # LLM 체인
     prompt_template_format = get_prompt_template(exp = prompt_template_format)
     chain = ChainControlTool(
@@ -160,15 +164,16 @@ def inference_exp(exp = "exp_1", num_output = -1):
         )
 
     # 추론
-    test_results = []
+    print("추론시작")
     i=0
+    test_results = []
     for idx, row in tqdm(test_data.iterrows()):
-        if i == int(num_output):
+        if i == num_output:
             break
-        print(i)
         question = get_prompt_question(row, exp = version_prompt_question)
+        print(question)
         result = chain.invoke(question)
-        # 여기서 참고문서 기록 후 아래에서 결과와 같이 저장할 필요 있음
+        # 여기서 참고문서 기록 후 아래에서 결과와 같이 저장할 필요 있음 
         print(result)
         # final_result = result['result'] # 결과에 참조문서 출력해야 함함
         final_result = result
@@ -180,7 +185,7 @@ def inference_exp(exp = "exp_1", num_output = -1):
     path_param = os.path.join(path_exp, 'exp.json')
     path_result = os.path.join(path_exp, 'result.csv')
     with open(path_param, 'w') as f:
-        json.dump(config_exp.to_dict(), f)
+        json.dump(exp.to_dict(), f)
     pd.DataFrame(test_results, columns=['answer']).to_csv(path_result, index=False)
 
 

@@ -1,6 +1,6 @@
 from typing import List
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 
 from .base import BaseVSUnit
