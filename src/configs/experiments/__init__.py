@@ -4,3 +4,5 @@ from .exp_2 import Experiment_2
 from .exp_3 import Experiment_3
 from .exp_4 import Experiment_4
 from .exp_5 import Experiment_5
+from .exp_6 import Experiment_6
+from .exp_7 import Experiment_7

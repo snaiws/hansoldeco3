@@ -215,6 +215,25 @@ class DF_to_docs:
         """
         return precendent
 
+    def exp_4(row):
+        components = []
+        components.append("다음과 같은 상황에서 공사 중 사고가 발생했습니다.")
+        if not pd.isna(row.get('사고원인')):
+            components.append(f"사고 원인: {row['사고원인']}")
+        # 대책
+        if not pd.isna(row.get('재발방지대책 및 향후조치계획')):
+            answer = f"대책: [{row['재발방지대책 및 향후조치계획']}]"
+        
+        # 모든 항목을 쉼표로 구분하여 결합
+        precendent = ", ".join(components)
+        precendent = f"""
+[질문]
+{precendent}
+[답변]
+{answer}
+        """
+        return precendent
+
 
 def get_prompt_precendent(data, exp:str = "exp_0", kwargs:dict = {}):
     return getattr(DF_to_docs, exp)(data, **kwargs)

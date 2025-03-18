@@ -202,6 +202,22 @@ class Question:
         return question
 
 
+    def exp_3(row):
+        components = []
+        components.append("다음과 같은 상황에서 공사 중 사고가 발생했습니다.")
+        
+        if not pd.isna(row.get('사고원인')):
+            components.append(f"사고 원인: {row['사고원인']}")
+
+        question = ", ".join(components)
+        question = f"""
+[질문]
+{question}
+[답변]
+"""
+        return question
+
+
 
 def get_prompt_question(data, exp:str = "exp_0", kwargs:dict = {}):
     return getattr(Question, exp)(data, **kwargs)

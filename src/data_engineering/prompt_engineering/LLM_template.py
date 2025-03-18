@@ -58,6 +58,18 @@ class Template:
 """
         )
     
+    @classmethod
+    def exp_3(cls):
+        return cls(
+            template = """[지침]
+당신은 건설 안전 전문가입니다. 최근 발생한 사고와 관련하여 어떤 조치를 취해야하는지 정답을 맞추시오. 절대 부가설명을 하지 말고 간략히 적으시오.
+
+[문제]
+{context}
+{question}
+"""
+        )
+    
 
 
 def get_prompt_template(exp = "exp_0"):
