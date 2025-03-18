@@ -1,5 +1,6 @@
 import datetime
 
+import pandas as pd
 import numpy as np
 
 
@@ -147,6 +148,8 @@ def preprocess_recogdelay(df):
     col2 = "사고인지 시간"
     col3 = "사고인지시차"
     df_ = df.copy()
+    df_[col1] = pd.to_datetime(df_[col1])
+    df_[col2] = pd.to_datetime(df_[col2])
     df_[col3] = (df_[col2]-df_[col1]).dt.seconds/3600
     df_.insert(df_.columns.get_loc(col2)+1, col3, df_.pop(col3))
     return df_
@@ -252,6 +255,13 @@ def preprocess_place_1(df):
     col = '장소'
     df_ = df.copy()
     df_[col] = df_[col].map(lambda x: x.replace('/','').replace('/','기타').strip())
+    df_.replace({col:{"":np.nan}}, inplace = True)
+    return df_
+
+def preprocess_place_2(df):
+    col = '장소'
+    df_ = df.copy()
+    df_[col] = df_[col].map(lambda x: x.replace('/','').strip())
     df_.replace({col:{"":np.nan}}, inplace = True)
     return df_
 
